@@ -14,6 +14,7 @@ class Traversal extends Component {
         0: { n: "?", s: "?", w: "?", e: "?" }
       },
       current_path: [],
+      traversal_path: [],
       num_explored: 1,
       last_response: {},
       config: {
@@ -98,7 +99,7 @@ class Traversal extends Component {
   };
 
   move_player = () => {
-    let current = this.state.current_room;
+    let current_room = this.state.current_room;
     let direction = this.pick_unexplored();
     let current_path = this.state.current_path;
     if (direction === null) {
@@ -110,6 +111,28 @@ class Traversal extends Component {
     }
 
     this.request_travel(direction);
+    // Checking if we have a new current room
+    if (current_room !== this.state.current_room) {
+      let next_room = this.state.current_room;
+      this.log_travel(current_room, next_room, direction);
+    }
+  };
+
+  log_travel = (current_room, next_room, direction) => {
+    let traversal_path = this.state.traversal_path;
+    let visited_rooms = this.state.visited_rooms;
+    let num_explored = this.state.unexplored;
+
+    traversal_path.push(direction);
+    if (next_room in visited_rooms) {
+    } else {
+      visited_rooms[next_room] = { n: "?", s: "?", w: "?", e: "?" };
+      num_explored++;
+    }
+    visited_rooms[current_room][direction] = next_room;
+    visited_rooms[next_room][this.reverse_direction(direction)] = current_room;
+
+    this.setState(traversal_path, visited_rooms, num_explored);
   };
 
   log_traversal = () => {};
