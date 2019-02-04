@@ -6,6 +6,9 @@ class Traversal extends Component {
     super(props);
     this.state = {
       current_room: 0,
+      exits: {},
+      coordinates: "",
+      cooldown: 0,
       visited_rooms: {
         0: { n: "?", s: "?", w: "?", e: "?" }
       },
@@ -30,14 +33,51 @@ class Traversal extends Component {
     axios
       .get(url, config)
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data); // <-- Debugging
+        this.setState({ last_response: res.data });
+        this.update_state(res.data);
       })
       .catch(err => {
         console.log(err);
       });
   };
 
-  pick_unexplored = () => {};
+  update_state = res => {
+    if ("room_id" in res) {
+      this.setState({
+        current_room: res.room_id,
+        exits: res.exits,
+        coordinates: res.coordinates,
+        cooldown: res.cooldown
+      });
+    }
+  };
+
+  pick_unexplored = () => {
+    let exits = this.state.exits;
+    let current = this.state.current_room;
+    let visited = this.state.visited_rooms;
+    let unexplored = [];
+    let directions = ["n", "s", "e", "w"];
+
+    for (let i = 0; i < directions.length; i++) {
+      if (directions[i] in exits) {
+        if (visited[current][directions[i]] === "?") {
+          unexplored.push(directions[i]);
+        }
+      } else {
+        visited[current][directions[i]] = "-";
+      }
+    }
+
+    this.setState({ visited: visited });
+
+    if (unexplored.length === 0) {
+      return null;
+    } else {
+      return unexplored[Math.floor(Math.random(unexplored.length))];
+    }
+  };
 
   move_player = () => {};
 
