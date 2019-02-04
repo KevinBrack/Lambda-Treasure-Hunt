@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+
+import Traversal from "./components/Traversal/Traversal";
 
 class App extends Component {
   render() {
@@ -19,6 +21,7 @@ class App extends Component {
           >
             Learn React
           </a>
+          <Traversal />
         </header>
       </div>
     );
