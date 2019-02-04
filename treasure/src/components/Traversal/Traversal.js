@@ -9,6 +9,7 @@ class Traversal extends Component {
       exits: {},
       coordinates: "",
       cooldown: 0,
+      cooldown_cleared: true,
       visited_rooms: {
         0: { n: "?", s: "?", w: "?", e: "?" }
       },
@@ -34,6 +35,23 @@ class Traversal extends Component {
       .get(url, config)
       .then(res => {
         // console.log(res.data); // <-- Debugging
+        this.setState({ last_response: res.data });
+        this.update_state(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  request_travel = direction => {
+    const config = this.state.config;
+    let url = "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/";
+    axios
+      .post(url, {
+        config,
+        direction: direction
+      })
+      .then(res => {
         this.setState({ last_response: res.data });
         this.update_state(res.data);
       })
@@ -79,11 +97,37 @@ class Traversal extends Component {
     }
   };
 
-  move_player = () => {};
+  move_player = () => {
+    let current = this.state.current_room;
+    let direction = this.pick_unexplored();
+    let current_path = this.state.current_path;
+    if (direction === null) {
+      direction = this.reverse_direction(current_path.pop());
+      this.setState({ current_path: current_path });
+    } else {
+      current_path.push(direction);
+      this.setState({ current_path: current_path });
+    }
+
+    this.request_travel(direction);
+  };
 
   log_traversal = () => {};
 
-  reverse_direction = () => {};
+  reverse_direction = direction => {
+    if (direction === "n") {
+      return "s";
+    }
+    if (direction === "s") {
+      return "n";
+    }
+    if (direction === "w") {
+      return "e";
+    }
+    if (direction === "e") {
+      return "w";
+    }
+  };
 
   render() {
     return <div>TRAVERSAL</div>;
