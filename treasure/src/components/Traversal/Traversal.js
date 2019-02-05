@@ -42,6 +42,15 @@ class Traversal extends Component {
       .catch(err => {
         console.log(err);
       });
+
+    // Retrieve previous visited_rooms from local storage
+    // and set on state
+    if (localStorage.getItem("visited_rooms") !== null) {
+      console.log("Found visited_rooms in localstorage");
+      this.setState({
+        visited_rooms: JSON.parse(localStorage.getItem("visited_rooms"))
+      });
+    }
   };
 
   request_travel = direction => {
@@ -155,6 +164,7 @@ class Traversal extends Component {
     visited_rooms[current_room][direction] = next_room;
     visited_rooms[next_room][this.reverse_direction(direction)] = current_room;
 
+    localStorage.setItem("visited_rooms", JSON.stringify(visited_rooms));
     this.setState({ traversal_path, visited_rooms, num_explored });
   };
 
