@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import Button from "../UI/Button/Button";
 
 class Traversal extends Component {
   constructor(props) {
@@ -19,6 +20,7 @@ class Traversal extends Component {
       last_response: {},
       config: {
         headers: {
+          "Content-Type": "application/json",
           Authorization: "Token " + process.env.REACT_APP_API_KEY
         }
       }
@@ -46,12 +48,11 @@ class Traversal extends Component {
 
   request_travel = direction => {
     const config = this.state.config;
+    const data = { direction: direction };
     let url = "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/";
+    // console.log("axios.post(", url, ", ", data, ", ", config, ")"); // <-- Debugging
     axios
-      .post(url, {
-        config,
-        direction: direction
-      })
+      .post(url, data, config)
       .then(res => {
         this.setState({ last_response: res.data });
         this.update_state(res.data);
@@ -80,7 +81,7 @@ class Traversal extends Component {
     let directions = ["n", "s", "e", "w"];
 
     for (let i = 0; i < directions.length; i++) {
-      if (directions[i] in exits) {
+      if (exits.includes(directions[i])) {
         if (visited[current][directions[i]] === "?") {
           unexplored.push(directions[i]);
         }
@@ -101,6 +102,7 @@ class Traversal extends Component {
   move_player = () => {
     let current_room = this.state.current_room;
     let direction = this.pick_unexplored();
+    // console.log("Direction: ", direction); // <-- Debugging
     let current_path = this.state.current_path;
     if (direction === null) {
       direction = this.reverse_direction(current_path.pop());
@@ -135,8 +137,6 @@ class Traversal extends Component {
     this.setState(traversal_path, visited_rooms, num_explored);
   };
 
-  log_traversal = () => {};
-
   reverse_direction = direction => {
     if (direction === "n") {
       return "s";
@@ -152,8 +152,21 @@ class Traversal extends Component {
     }
   };
 
+  handle_move_click = () => {
+    this.move_player();
+  };
+
   render() {
-    return <div>TRAVERSAL</div>;
+    return (
+      <div className="traversal-container">
+        <div>TRAVERSAL</div>
+        <Button
+          text="Move"
+          clicky={this.handle_move_click}
+          disabled={!this.state.cooldown_cleared}
+        />
+      </div>
+    );
   }
 }
 
