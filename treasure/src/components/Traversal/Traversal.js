@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import ReactTimeout from "react-timeout";
 import Button from "../UI/Button/Button";
 
 class Traversal extends Component {
@@ -59,13 +60,16 @@ class Traversal extends Component {
   };
 
   update_state = res => {
+    console.log("RESPONSE: ", res);
     if ("room_id" in res) {
+      this.cooldown(res.cooldown);
       this.setState({
         last_response: res,
         current_room: res.room_id,
         exits: res.exits,
         coordinates: res.coordinates,
-        cooldown: res.cooldown
+        cooldown: res.cooldown,
+        cooldown_cleared: false
       });
     } else {
       this.setState({
@@ -169,6 +173,14 @@ class Traversal extends Component {
     }
   };
 
+  handle_cooldown = time => {
+    this.props.setTimeout(this.clear_cooldown, time * 1000);
+  };
+
+  clear_cooldown = () => {
+    this.setState({ cooldown_cleared: true });
+  };
+
   handle_move_click = () => {
     this.move_player();
   };
@@ -187,4 +199,4 @@ class Traversal extends Component {
   }
 }
 
-export default Traversal;
+export default ReactTimeout(Traversal);
