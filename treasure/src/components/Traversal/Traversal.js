@@ -7,7 +7,7 @@ class Traversal extends Component {
     super(props);
     this.state = {
       current_room: 0,
-      exits: {},
+      exits: [],
       coordinates: "",
       cooldown: 0,
       cooldown_cleared: true,
@@ -74,9 +74,9 @@ class Traversal extends Component {
   };
 
   pick_unexplored = () => {
-    let exits = this.state.exits;
+    let exits = this.state.exits.slice();
     let current = this.state.current_room;
-    let visited = this.state.visited_rooms;
+    let visited = { ...this.state.visited_rooms };
     let unexplored = [];
     let directions = ["n", "s", "e", "w"];
 
@@ -90,7 +90,7 @@ class Traversal extends Component {
       }
     }
 
-    this.setState({ visited: visited });
+    this.setState({ visited_rooms: visited });
 
     if (unexplored.length === 0) {
       return null;
@@ -103,7 +103,7 @@ class Traversal extends Component {
     let current_room = this.state.current_room;
     let direction = this.pick_unexplored();
     // console.log("Direction: ", direction); // <-- Debugging
-    let current_path = this.state.current_path;
+    let current_path = this.state.current_path.slice();
     if (direction === null) {
       direction = this.reverse_direction(current_path.pop());
       this.setState({ current_path: current_path });
@@ -121,9 +121,9 @@ class Traversal extends Component {
   };
 
   log_travel = (current_room, next_room, direction) => {
-    let traversal_path = this.state.traversal_path;
-    let visited_rooms = this.state.visited_rooms;
-    let num_explored = this.state.unexplored;
+    let traversal_path = this.state.traversal_path.slice();
+    let visited_rooms = { ...this.state.visited_rooms };
+    let num_explored = this.state.num_explored;
 
     traversal_path.push(direction);
     if (next_room in visited_rooms) {
@@ -134,7 +134,7 @@ class Traversal extends Component {
     visited_rooms[current_room][direction] = next_room;
     visited_rooms[next_room][this.reverse_direction(direction)] = current_room;
 
-    this.setState(traversal_path, visited_rooms, num_explored);
+    this.setState({ traversal_path, visited_rooms, num_explored });
   };
 
   reverse_direction = direction => {
