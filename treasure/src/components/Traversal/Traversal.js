@@ -6,14 +6,12 @@ class Traversal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      current_room: 0,
+      current_room: null,
       exits: [],
       coordinates: "",
-      cooldown: 0,
+      cooldown: null,
       cooldown_cleared: true,
-      visited_rooms: {
-        0: { n: "?", s: "?", w: "?", e: "?" }
-      },
+      visited_rooms: {},
       current_path: [],
       traversal_path: [],
       num_explored: 1,
@@ -38,7 +36,6 @@ class Traversal extends Component {
       .get(url, config)
       .then(res => {
         // console.log(res.data); // <-- Debugging
-        this.setState({ last_response: res.data });
         this.update_state(res.data);
       })
       .catch(err => {
@@ -54,7 +51,6 @@ class Traversal extends Component {
     axios
       .post(url, data, config)
       .then(res => {
-        this.setState({ last_response: res.data });
         this.update_state(res.data);
       })
       .catch(err => {
@@ -65,10 +61,15 @@ class Traversal extends Component {
   update_state = res => {
     if ("room_id" in res) {
       this.setState({
+        last_response: res,
         current_room: res.room_id,
         exits: res.exits,
         coordinates: res.coordinates,
         cooldown: res.cooldown
+      });
+    } else {
+      this.setState({
+        last_response: res
       });
     }
   };
@@ -76,21 +77,28 @@ class Traversal extends Component {
   pick_unexplored = () => {
     let exits = this.state.exits.slice();
     let current = this.state.current_room;
-    let visited = { ...this.state.visited_rooms };
+    let visited_rooms = { ...this.state.visited_rooms };
     let unexplored = [];
     let directions = ["n", "s", "e", "w"];
 
+    // check if current room has object in visited
+    // if not, create it
+    if (current in visited_rooms) {
+    } else {
+      visited_rooms[current] = { n: "?", s: "?", w: "?", e: "?" };
+    }
+
     for (let i = 0; i < directions.length; i++) {
       if (exits.includes(directions[i])) {
-        if (visited[current][directions[i]] === "?") {
+        if (visited_rooms[current][directions[i]] === "?") {
           unexplored.push(directions[i]);
         }
       } else {
-        visited[current][directions[i]] = "-";
+        visited_rooms[current][directions[i]] = "-";
       }
     }
 
-    this.setState({ visited_rooms: visited });
+    this.setState({ visited_rooms });
 
     if (unexplored.length === 0) {
       return null;
@@ -117,6 +125,8 @@ class Traversal extends Component {
     if (current_room !== this.state.current_room) {
       let next_room = this.state.current_room;
       this.log_travel(current_room, next_room, direction);
+    } else {
+      console.log("Something went wrong, you did not move");
     }
   };
 
