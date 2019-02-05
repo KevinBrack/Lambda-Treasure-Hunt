@@ -62,7 +62,6 @@ class Traversal extends Component {
   update_state = res => {
     console.log("RESPONSE: ", res);
     if ("room_id" in res) {
-      this.cooldown(res.cooldown);
       this.setState({
         last_response: res,
         current_room: res.room_id,
@@ -71,6 +70,7 @@ class Traversal extends Component {
         cooldown: res.cooldown,
         cooldown_cleared: false
       });
+      this.handle_cooldown(res.cooldown);
     } else {
       this.setState({
         last_response: res
