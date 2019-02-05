@@ -48,7 +48,7 @@ class Traversal extends Component {
     const data = { direction: direction };
     let url = "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/";
     // console.log("axios.post(", url, ", ", data, ", ", config, ")"); // <-- Debugging
-    axios
+    return axios
       .post(url, data, config)
       .then(res => {
         this.update_state(res.data);
@@ -120,14 +120,21 @@ class Traversal extends Component {
       this.setState({ current_path: current_path });
     }
 
-    this.request_travel(direction);
-    // Checking if we have a new current room
-    if (current_room !== this.state.current_room) {
-      let next_room = this.state.current_room;
-      this.log_travel(current_room, next_room, direction);
-    } else {
-      console.log("Something went wrong, you did not move");
-    }
+    this.request_travel(direction).then(() => {
+      console.log(
+        "Current: ",
+        current_room,
+        " Next: ",
+        this.state.current_room
+      );
+      if (current_room !== this.state.current_room) {
+        // Checking if we have a new current room
+        let next_room = this.state.current_room;
+        this.log_travel(current_room, next_room, direction);
+      } else {
+        console.log("Something went wrong, you did not move");
+      }
+    });
   };
 
   log_travel = (current_room, next_room, direction) => {
