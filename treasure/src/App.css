@@ -8,7 +8,10 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #004a8f;
+  background-image: url("https://images.pexels.com/photos/1624438/pexels-photo-1624438.jpeg");
+  background-position: center;
+  background-size: cover;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
