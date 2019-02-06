@@ -9,7 +9,7 @@ class Traversal extends Component {
     this.state = {
       current_room: null,
       exits: [],
-      coordinates: "",
+      coordinates: [],
       cooldown: null,
       cooldown_cleared: true,
       visited_rooms: {},
@@ -22,7 +22,9 @@ class Traversal extends Component {
           "Content-Type": "application/json",
           Authorization: "Token " + process.env.REACT_APP_API_KEY
         }
-      }
+      },
+      auto_enabled: false,
+      max_rooms: 500
     };
   }
 
@@ -43,19 +45,77 @@ class Traversal extends Component {
         console.log(err);
       });
 
+    // LOCAL STORAGE DEBUGGING
+    console.log(
+      "LOCAL-VISITED_ROOMS: ",
+      localStorage.getItem("visited_rooms"),
+      " TYPE: ",
+      typeof localStorage.getItem("visited_rooms")
+    );
+    console.log(
+      "LOCAL-CURRENT_PATH: ",
+      localStorage.getItem("current_path"),
+      " TYPE: ",
+      typeof localStorage.getItem("current_path")
+    );
+    console.log(
+      "LOCAL-TRAVERSAL_PATH: ",
+      localStorage.getItem("traversal_path"),
+      " TYPE: ",
+      typeof localStorage.getItem("traversal_path")
+    );
+
     // Retrieve previous visited_rooms from local storage
     // and set on state
-    if (localStorage.getItem("visited_rooms") !== null) {
+
+    if (
+      localStorage.getItem("visited_rooms") !== "null" &&
+      localStorage.getItem("visited_rooms") !== null
+    ) {
       console.log("Found visited_rooms in localstorage");
+      let visited_rooms = JSON.parse(localStorage.getItem("visited_rooms"));
+      let num_explored = Object.keys(visited_rooms).length;
       this.setState({
-        visited_rooms: JSON.parse(localStorage.getItem("visited_rooms"))
+        visited_rooms,
+        num_explored
+      });
+    }
+    if (
+      localStorage.getItem("current_path") !== "null" &&
+      localStorage.getItem("current_path") !== null
+    ) {
+      console.log("Found current_path in localstorage");
+      let current_path = JSON.parse(localStorage.getItem("current_path"));
+      this.setState({
+        current_path
+      });
+    }
+    if (
+      localStorage.getItem("traversal_path") !== "null" &&
+      localStorage.getItem("traversal_path") !== null
+    ) {
+      console.log("Found traversal_path in localstorage");
+      let traversal_path = JSON.parse(localStorage.getItem("traversal_path"));
+      this.setState({
+        traversal_path
       });
     }
   };
 
+  log_coordinates = () => {};
+
   request_travel = direction => {
     const config = this.state.config;
     const data = { direction: direction };
+    // if (this.state.current_room in this.state.visited_rooms) {
+    //   let visited_rooms = this.state.visited_rooms;
+    //   let current_room = this.state.current_room;
+    //   let current_log = visited_rooms[current_room];
+    //   if (current_log[direction] !== "?" && current_log[direction] !== "-") {
+    //     data.next_room_id = current_log[direction];
+    //   }
+    // }
+    console.log("REQUESTED DATA: ", data);
     let url = "https://lambda-treasure-hunt.herokuapp.com/api/adv/move/";
     // console.log("axios.post(", url, ", ", data, ", ", config, ")"); // <-- Debugging
     return axios
@@ -75,7 +135,7 @@ class Traversal extends Component {
         last_response: res,
         current_room: res.room_id,
         exits: res.exits,
-        coordinates: res.coordinates,
+        coordinates: this.coordinates_to_arr(res.coordinates),
         cooldown: res.cooldown,
         cooldown_cleared: false
       });
@@ -98,7 +158,13 @@ class Traversal extends Component {
     // if not, create it
     if (current in visited_rooms) {
     } else {
-      visited_rooms[current] = { n: "?", s: "?", w: "?", e: "?" };
+      visited_rooms[current] = {
+        n: "?",
+        s: "?",
+        w: "?",
+        e: "?",
+        coordinates: []
+      };
     }
 
     for (let i = 0; i < directions.length; i++) {
@@ -154,17 +220,26 @@ class Traversal extends Component {
     let traversal_path = this.state.traversal_path.slice();
     let visited_rooms = { ...this.state.visited_rooms };
     let num_explored = this.state.num_explored;
+    let current_path = this.state.traversal_path.slice();
 
     traversal_path.push(direction);
     if (next_room in visited_rooms) {
     } else {
-      visited_rooms[next_room] = { n: "?", s: "?", w: "?", e: "?" };
+      visited_rooms[next_room] = {
+        n: "?",
+        s: "?",
+        w: "?",
+        e: "?",
+        coordinates: []
+      };
       num_explored++;
     }
     visited_rooms[current_room][direction] = next_room;
     visited_rooms[next_room][this.reverse_direction(direction)] = current_room;
 
     localStorage.setItem("visited_rooms", JSON.stringify(visited_rooms));
+    localStorage.setItem("current_path", JSON.stringify(current_path));
+    localStorage.setItem("traversal_path", JSON.stringify(traversal_path));
     this.setState({ traversal_path, visited_rooms, num_explored });
   };
 
@@ -183,16 +258,47 @@ class Traversal extends Component {
     }
   };
 
+  coordinates_to_arr = tuple => {
+    let result = "";
+    for (let i = 1; i < tuple.length - 1; i++) {
+      result += tuple[i];
+    }
+    return result.split(",");
+  };
+
+  clear_local_storage = () => {
+    localStorage.setItem("visited_rooms", null);
+    localStorage.setItem("current_path", null);
+    localStorage.setItem("traversal_path", null);
+    console.log("STORAGE CLEARED");
+  };
+
   handle_cooldown = time => {
     this.props.setTimeout(this.clear_cooldown, time * 1000);
   };
 
   clear_cooldown = () => {
     this.setState({ cooldown_cleared: true });
+    this.auto_loop();
   };
 
   handle_move_click = () => {
     this.move_player();
+  };
+
+  toggle_auto = () => {
+    this.setState({ auto_enabled: !this.state.auto_enabled });
+  };
+
+  auto_loop = () => {
+    if (Object.keys(this.state.visited_rooms).length < this.state.max_rooms) {
+      if (this.state.auto_enabled) {
+        this.move_player();
+      }
+    } else {
+      this.setState({ auto_enabled: false });
+      console.log("ALL ROOMS TRAVERSED. WOOT!!!");
+    }
   };
 
   render() {
@@ -204,6 +310,23 @@ class Traversal extends Component {
           clicky={this.handle_move_click}
           disabled={!this.state.cooldown_cleared}
         />
+        <Button
+          text="Clear Storage"
+          clicky={this.clear_local_storage}
+          disabled={false}
+        />
+        <Button
+          text="AUTO TRAVERSE"
+          clicky={this.toggle_auto}
+          disabled={false}
+        />
+        <div>
+          Current Room: {this.state.current_room}
+          <br />
+          <h3>{this.state.last_response.title}</h3>
+          <br />
+          Cooldown: {this.state.cooldown}
+        </div>
       </div>
     );
   }
