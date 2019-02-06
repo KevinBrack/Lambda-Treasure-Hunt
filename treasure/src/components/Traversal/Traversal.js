@@ -75,10 +75,15 @@ class Traversal extends Component {
       console.log("Found visited_rooms in localstorage");
       let visited_rooms = JSON.parse(localStorage.getItem("visited_rooms"));
       let num_explored = Object.keys(visited_rooms).length;
-      this.setState({
-        visited_rooms,
-        num_explored
-      });
+      this.setState(
+        {
+          visited_rooms,
+          num_explored
+        },
+        () => {
+          this.log_coordinates();
+        }
+      );
     }
     if (
       localStorage.getItem("current_path") !== "null" &&
@@ -102,7 +107,28 @@ class Traversal extends Component {
     }
   };
 
-  log_coordinates = () => {};
+  log_coordinates = () => {
+    let visited_rooms = { ...this.state.visited_rooms };
+    let current_room = this.state.current_room;
+    if (current_room in visited_rooms) {
+    } else {
+      visited_rooms[current_room] = {
+        n: "?",
+        s: "?",
+        w: "?",
+        e: "?",
+        coordinates: []
+      };
+    }
+    let coordinates = this.state.coordinates;
+    let current_visited = visited_rooms[current_room];
+    if (current_visited.coordinates.length === 0) {
+      current_visited.coordinates = coordinates;
+      this.setState({ visited_rooms }, () => {
+        console.log("COORDINATES LOGGED: ", current_visited.coordinates);
+      });
+    }
+  };
 
   request_travel = direction => {
     const config = this.state.config;
@@ -131,14 +157,19 @@ class Traversal extends Component {
   update_state = res => {
     console.log("RESPONSE: ", res);
     if ("room_id" in res) {
-      this.setState({
-        last_response: res,
-        current_room: res.room_id,
-        exits: res.exits,
-        coordinates: this.coordinates_to_arr(res.coordinates),
-        cooldown: res.cooldown,
-        cooldown_cleared: false
-      });
+      this.setState(
+        {
+          last_response: res,
+          current_room: res.room_id,
+          exits: res.exits,
+          coordinates: this.coordinates_to_arr(res.coordinates),
+          cooldown: res.cooldown,
+          cooldown_cleared: false
+        },
+        () => {
+          this.log_coordinates();
+        }
+      );
       this.handle_cooldown(res.cooldown);
     } else {
       this.setState({
@@ -213,6 +244,7 @@ class Traversal extends Component {
       } else {
         console.log("Something went wrong, you did not move");
       }
+      this.log_coordinates();
     });
   };
 
@@ -316,7 +348,7 @@ class Traversal extends Component {
           disabled={false}
         />
         <Button
-          text="AUTO TRAVERSE"
+          text="Auto Traverse"
           clicky={this.toggle_auto}
           disabled={false}
         />
