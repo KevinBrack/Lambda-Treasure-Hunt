@@ -364,8 +364,8 @@ class Traversal extends Component {
           <br />
           {Object.keys(this.props.visited_rooms).length} out of{" "}
           {this.state.max_rooms} traversed
-          <br />
-          <h3>{this.state.last_response.title}</h3>
+          {/* <br />
+          <h3>{this.state.last_response.title}</h3> */}
           <br />
           Cooldown: {this.state.cooldown}
         </div>

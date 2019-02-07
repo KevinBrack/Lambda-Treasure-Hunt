@@ -3,7 +3,7 @@ import MapNode from "./MapNode";
 import { Grid, Cell } from "styled-css-grid";
 import "./MapContainer.scss";
 
-const MyGrid = (width, height) => {
+const MyGrid = (width, height, current_room, graph) => {
   let cord_permutations = [];
   for (let i = 0; i < width.length; i++) {
     for (let j = 0; j < height.length; j++) {
@@ -13,6 +13,8 @@ const MyGrid = (width, height) => {
           active={false}
           x={width[i]}
           y={height[j]}
+          graph={graph}
+          current_room={current_room}
         />
       );
     }
@@ -34,7 +36,12 @@ const MapContainer = props => {
       MAP CONTAINER
       <br />
       {props.grid_coords
-        ? MyGrid(props.grid_coords.x, props.grid_coords.y)
+        ? MyGrid(
+            props.grid_coords.x,
+            props.grid_coords.y,
+            props.current_room,
+            props.graph
+          )
         : null}
     </div>
   );

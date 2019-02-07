@@ -25,6 +25,7 @@ class MapState extends Component {
           graph_stats={this.state.graph_stats}
           graph={this.props.graph}
           grid_coords={this.state.graph_stats.grid_size}
+          current_room={this.props.current_room}
         />
       </div>
     );
