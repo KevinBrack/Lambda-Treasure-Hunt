@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 
 import Traversal from "./components/Traversal/Traversal";
+import MapState from "./components/Map/MapState";
 
 class App extends Component {
   constructor(props) {
@@ -11,6 +12,10 @@ class App extends Component {
       current_room: null,
       show_ui: true
     };
+  }
+
+  componentDidMount() {
+    this.init();
   }
 
   init = () => {
@@ -27,19 +32,10 @@ class App extends Component {
     ) {
       console.log("Found visited_rooms in localstorage");
       let graph = JSON.parse(localStorage.getItem("visited_rooms"));
-      this.setState(
-        {
-          graph
-        },
-        () => {
-          this.trigger_log_coordinates();
-        }
-      );
+      this.setState({
+        graph
+      });
     }
-  };
-
-  trigger_log_coordinates = () => {
-    this.refs.traversal.log_coordinates();
   };
 
   update_graph_handler = graph => {
@@ -60,8 +56,8 @@ class App extends Component {
             visited_rooms={this.state.graph}
             current_room={this.state.current_room}
             show_ui={this.state.show_ui}
-            ref="traversal"
           />
+          <MapState graph={this.state.graph} />
         </header>
       </div>
     );
