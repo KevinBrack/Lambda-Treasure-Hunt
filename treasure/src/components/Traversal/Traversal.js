@@ -7,7 +7,7 @@ class Traversal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      current_room: null,
+      // current_room: null,
       exits: [],
       coordinates: [],
       cooldown: null,
@@ -109,7 +109,7 @@ class Traversal extends Component {
 
   log_coordinates = () => {
     let visited_rooms = { ...this.state.visited_rooms };
-    let current_room = this.state.current_room;
+    let current_room = this.props.current_room;
     if (current_room in visited_rooms) {
     } else {
       visited_rooms[current_room] = {
@@ -160,14 +160,18 @@ class Traversal extends Component {
       this.setState(
         {
           last_response: res,
-          current_room: res.room_id,
+          // current_room: res.room_id,
           exits: res.exits,
           coordinates: this.coordinates_to_arr(res.coordinates),
           cooldown: res.cooldown,
           cooldown_cleared: false
         },
+        // TEST! Do I need to pass res in here again
+        // or is it still in scope from the outer function
+        // if you remove res replace ()
         () => {
           this.log_coordinates();
+          this.props.update_current_room_handler(res.room_id);
         }
       );
       this.handle_cooldown(res.cooldown);
@@ -180,7 +184,7 @@ class Traversal extends Component {
 
   pick_unexplored = () => {
     let exits = this.state.exits.slice();
-    let current = this.state.current_room;
+    let current = this.props.current_room;
     let visited_rooms = { ...this.state.visited_rooms };
     let unexplored = [];
     let directions = ["n", "s", "e", "w"];
@@ -218,7 +222,7 @@ class Traversal extends Component {
   };
 
   move_player = () => {
-    let current_room = this.state.current_room;
+    let current_room = this.props.current_room;
     let direction = this.pick_unexplored();
     // console.log("Direction: ", direction); // <-- Debugging
     let current_path = this.state.current_path.slice();
@@ -235,11 +239,11 @@ class Traversal extends Component {
         "Current: ",
         current_room,
         " Next: ",
-        this.state.current_room
+        this.props.current_room
       );
-      if (current_room !== this.state.current_room) {
+      if (current_room !== this.props.current_room) {
         // Checking if we have a new current room
-        let next_room = this.state.current_room;
+        let next_room = this.props.current_room;
         this.log_travel(current_room, next_room, direction);
       } else {
         console.log("Something went wrong, you did not move");
@@ -353,7 +357,7 @@ class Traversal extends Component {
           disabled={false}
         />
         <div>
-          Current Room: {this.state.current_room}
+          Current Room: {this.props.current_room}
           <br />
           {Object.keys(this.state.visited_rooms).length} out of{" "}
           {this.state.max_rooms} traversed

@@ -28,7 +28,7 @@ class App extends Component {
           <Traversal
             update_graph_handler={this.update_state_handler}
             update_current_room_handler={this.update_current_room_handler}
-            graph={this.state.graph}
+            visited_rooms={this.state.graph}
             current_room={this.state.current_room}
             show_ui={this.state.show_ui}
           />
