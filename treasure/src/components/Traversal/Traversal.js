@@ -12,7 +12,7 @@ class Traversal extends Component {
       coordinates: [],
       cooldown: null,
       cooldown_cleared: true,
-      visited_rooms: {},
+      // visited_rooms: {},
       current_path: [],
       traversal_path: [],
       num_explored: 1,
@@ -46,12 +46,7 @@ class Traversal extends Component {
       });
 
     // LOCAL STORAGE DEBUGGING
-    console.log(
-      "LOCAL-VISITED_ROOMS: ",
-      localStorage.getItem("visited_rooms"),
-      " TYPE: ",
-      typeof localStorage.getItem("visited_rooms")
-    );
+
     console.log(
       "LOCAL-CURRENT_PATH: ",
       localStorage.getItem("current_path"),
@@ -68,23 +63,25 @@ class Traversal extends Component {
     // Retrieve previous visited_rooms from local storage
     // and set on state
 
-    if (
-      localStorage.getItem("visited_rooms") !== "null" &&
-      localStorage.getItem("visited_rooms") !== null
-    ) {
-      console.log("Found visited_rooms in localstorage");
-      let visited_rooms = JSON.parse(localStorage.getItem("visited_rooms"));
-      let num_explored = Object.keys(visited_rooms).length;
-      this.setState(
-        {
-          visited_rooms,
-          num_explored
-        },
-        () => {
-          this.log_coordinates();
-        }
-      );
-    }
+    // MOVED TO APP
+    // if (
+    //   localStorage.getItem("visited_rooms") !== "null" &&
+    //   localStorage.getItem("visited_rooms") !== null
+    // ) {
+    //   console.log("Found visited_rooms in localstorage");
+    //   let visited_rooms = JSON.parse(localStorage.getItem("visited_rooms"));
+    //   let num_explored = Object.keys(visited_rooms).length;
+    //   this.setState(
+    //     {
+    //       // visited_rooms,
+    //       num_explored
+    //     },
+    //     () => {
+    //       this.props.update_graph_handler(visited_rooms);
+    //       this.log_coordinates();
+    //     }
+    //   );
+    // }
     if (
       localStorage.getItem("current_path") !== "null" &&
       localStorage.getItem("current_path") !== null
@@ -108,7 +105,7 @@ class Traversal extends Component {
   };
 
   log_coordinates = () => {
-    let visited_rooms = { ...this.state.visited_rooms };
+    let visited_rooms = { ...this.props.visited_rooms };
     let current_room = this.props.current_room;
     if (current_room in visited_rooms) {
     } else {
@@ -124,18 +121,19 @@ class Traversal extends Component {
     let current_visited = visited_rooms[current_room];
     if (current_visited.coordinates.length === 0) {
       current_visited.coordinates = coordinates;
-      this.setState({ visited_rooms }, () => {
-        console.log("COORDINATES LOGGED: ", current_visited.coordinates);
-      });
+      // TODO: No longer setting state here
+      // Need to refactor
+      this.props.update_graph_handler(visited_rooms);
+      console.log("COORDINATES LOGGED: ", current_visited.coordinates);
     }
   };
 
   request_travel = direction => {
     const config = this.state.config;
     const data = { direction: direction };
-    // if (this.state.current_room in this.state.visited_rooms) {
-    //   let visited_rooms = this.state.visited_rooms;
-    //   let current_room = this.state.current_room;
+    // if (this.state.current_room in this.props.visited_rooms) {
+    //   let visited_rooms = this.props.visited_rooms;
+    //   let current_room = this.props.current_room;
     //   let current_log = visited_rooms[current_room];
     //   if (current_log[direction] !== "?" && current_log[direction] !== "-") {
     //     data.next_room_id = current_log[direction];
@@ -166,9 +164,6 @@ class Traversal extends Component {
           cooldown: res.cooldown,
           cooldown_cleared: false
         },
-        // TEST! Do I need to pass res in here again
-        // or is it still in scope from the outer function
-        // if you remove res replace ()
         () => {
           this.log_coordinates();
           this.props.update_current_room_handler(res.room_id);
@@ -185,7 +180,7 @@ class Traversal extends Component {
   pick_unexplored = () => {
     let exits = this.state.exits.slice();
     let current = this.props.current_room;
-    let visited_rooms = { ...this.state.visited_rooms };
+    let visited_rooms = { ...this.props.visited_rooms };
     let unexplored = [];
     let directions = ["n", "s", "e", "w"];
 
@@ -254,7 +249,7 @@ class Traversal extends Component {
 
   log_travel = (current_room, next_room, direction) => {
     let traversal_path = this.state.traversal_path.slice();
-    let visited_rooms = { ...this.state.visited_rooms };
+    let visited_rooms = { ...this.props.visited_rooms };
     let num_explored = this.state.num_explored;
     let current_path = this.state.traversal_path.slice();
 
@@ -276,7 +271,9 @@ class Traversal extends Component {
     localStorage.setItem("visited_rooms", JSON.stringify(visited_rooms));
     localStorage.setItem("current_path", JSON.stringify(current_path));
     localStorage.setItem("traversal_path", JSON.stringify(traversal_path));
-    this.setState({ traversal_path, visited_rooms, num_explored });
+    this.setState({ traversal_path, num_explored }, () => {
+      this.props.update_graph_handler(visited_rooms);
+    });
   };
 
   reverse_direction = direction => {
@@ -327,7 +324,7 @@ class Traversal extends Component {
   };
 
   auto_loop = () => {
-    if (Object.keys(this.state.visited_rooms).length < this.state.max_rooms) {
+    if (Object.keys(this.props.visited_rooms).length < this.state.max_rooms) {
       if (this.state.auto_enabled) {
         this.move_player();
       }
@@ -359,7 +356,7 @@ class Traversal extends Component {
         <div>
           Current Room: {this.props.current_room}
           <br />
-          {Object.keys(this.state.visited_rooms).length} out of{" "}
+          {Object.keys(this.props.visited_rooms).length} out of{" "}
           {this.state.max_rooms} traversed
           <br />
           <h3>{this.state.last_response.title}</h3>
