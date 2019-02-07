@@ -57,7 +57,9 @@ class App extends Component {
             current_room={this.state.current_room}
             show_ui={this.state.show_ui}
           />
-          <MapState graph={this.state.graph} />
+          {Object.keys(this.state.graph).length === 0 ? null : (
+            <MapState graph={this.state.graph} />
+          )}
         </header>
       </div>
     );

@@ -1,5 +1,5 @@
 import React from "react";
-import "./MapNode.css";
+import "./MapNode.scss";
 
 const MapNode = props => {
   return (

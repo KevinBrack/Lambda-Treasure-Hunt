@@ -1,7 +1,7 @@
 import React from "react";
 import MapNode from "./MapNode";
 import { Grid, Cell } from "styled-css-grid";
-import "./MapContainer.css";
+import "./MapContainer.scss";
 
 const MyGrid = (width, height) => {
   let cord_permutations = [];
