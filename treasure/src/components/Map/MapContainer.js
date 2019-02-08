@@ -33,8 +33,6 @@ const MyGrid = (width, height, current_room, graph) => {
 const MapContainer = props => {
   return (
     <div className="map-container">
-      MAP CONTAINER
-      <br />
       {props.grid_coords
         ? MyGrid(
             props.grid_coords.x,

@@ -5,10 +5,6 @@ const find_me = (graph, x, y) => {
   for (let key in graph) {
     let current_test = [String(x), String(y)];
     let current_cords = graph[key].coordinates;
-    // console.log("GRAPH CORDS", graph[key].coordinates);
-    // console.log("CURRENT CORDS TEST", current_test);
-    // This was being so dumb.
-    // graph[key].coordinates would never equal current test.
     if (current_cords[0] == current_test[0]) {
       if (current_cords[1] == current_test[1]) {
         console.log("FOUND MYSELF!");
