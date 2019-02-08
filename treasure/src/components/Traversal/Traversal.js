@@ -346,6 +346,7 @@ class Traversal extends Component {
       <div className="traversal-container">
         <StatsDisplay
           stats={{
+            last_response: this.state.last_response,
             current_room: this.props.current_room,
             rooms_visited: Object.keys(this.props.visited_rooms).length,
             max_rooms: this.state.max_rooms,
