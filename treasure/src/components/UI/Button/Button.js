@@ -3,15 +3,21 @@ import "./Button.scss";
 import React from "react";
 
 const Button = props => {
+  let button_classlist = ["button"];
+  if (props.disabled) {
+    button_classlist.push("button-disabled");
+  }
+  if (!props.disabled) {
+    button_classlist.push("button-enabled");
+  }
+  if (props.active) {
+    button_classlist.push("button-active");
+  }
   return (
     <div className="button-container">
-      {props.disabled ? (
-        <div className="button button-disabled">{props.text}</div>
-      ) : (
-        <div className="button button-enabled" onClick={props.clicky}>
-          {props.text}
-        </div>
-      )}
+      <div className={button_classlist.join(" ")} onClick={props.clicky}>
+        {props.text}
+      </div>
     </div>
   );
 };

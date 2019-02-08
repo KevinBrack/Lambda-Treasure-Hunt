@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import axios from "axios";
 import ReactTimeout from "react-timeout";
 import Button from "../UI/Button/Button";
+import StatsDisplay from "../Traversal/StatsDisplay";
+import ControlPanel from "./ControlPanel";
 
 class Traversal extends Component {
   constructor(props) {
@@ -344,31 +346,22 @@ class Traversal extends Component {
     return (
       <div className="traversal-container">
         <div>TRAVERSAL</div>
-        <Button
-          text="Move"
-          clicky={this.handle_move_click}
-          disabled={!this.state.cooldown_cleared}
+        <ControlPanel
+          move={{
+            clicky: this.handle_move_click,
+            disabled: !this.state.cooldown_cleared
+          }}
+          clear={{ clicky: this.clear_local_storage }}
+          auto={{ clicky: this.toggle_auto, active: this.state.auto_enabled }}
         />
-        <Button
-          text="Clear Storage"
-          clicky={this.clear_local_storage}
-          disabled={false}
+        <StatsDisplay
+          stats={{
+            current_room: this.props.current_room,
+            rooms_visited: Object.keys(this.props.visited_rooms).length,
+            max_rooms: this.state.max_rooms,
+            cooldown: this.state.cooldown
+          }}
         />
-        <Button
-          text="Auto Traverse"
-          clicky={this.toggle_auto}
-          disabled={false}
-        />
-        <div>
-          Current Room: {this.props.current_room}
-          <br />
-          {Object.keys(this.props.visited_rooms).length} out of{" "}
-          {this.state.max_rooms} traversed
-          {/* <br />
-          <h3>{this.state.last_response.title}</h3> */}
-          <br />
-          Cooldown: {this.state.cooldown}
-        </div>
       </div>
     );
   }
