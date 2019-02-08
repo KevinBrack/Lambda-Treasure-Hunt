@@ -20,7 +20,7 @@ class MapState extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div>
         <MapContainer
           graph_stats={this.state.graph_stats}
           graph={this.props.graph}
