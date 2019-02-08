@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
 import ReactTimeout from "react-timeout";
-import Button from "../UI/Button/Button";
 import StatsDisplay from "../Traversal/StatsDisplay";
 import ControlPanel from "./ControlPanel";
 
@@ -345,15 +344,6 @@ class Traversal extends Component {
   render() {
     return (
       <div className="traversal-container">
-        <div>TRAVERSAL</div>
-        <ControlPanel
-          move={{
-            clicky: this.handle_move_click,
-            disabled: !this.state.cooldown_cleared
-          }}
-          clear={{ clicky: this.clear_local_storage }}
-          auto={{ clicky: this.toggle_auto, active: this.state.auto_enabled }}
-        />
         <StatsDisplay
           stats={{
             current_room: this.props.current_room,
@@ -361,6 +351,14 @@ class Traversal extends Component {
             max_rooms: this.state.max_rooms,
             cooldown: this.state.cooldown
           }}
+        />
+        <ControlPanel
+          move={{
+            clicky: this.handle_move_click,
+            disabled: !this.state.cooldown_cleared
+          }}
+          clear={{ clicky: this.clear_local_storage }}
+          auto={{ clicky: this.toggle_auto, active: this.state.auto_enabled }}
         />
       </div>
     );
