@@ -26,14 +26,30 @@ const MapNode = props => {
   let found_me = find_me(graph, x, y);
   if (found_me !== null) {
     class_list.push("m-node-exists");
+
+    if (graph[found_me.key].n !== "?" && graph[found_me.key].n !== "-") {
+      class_list.push("m-node-n-connected");
+    }
+    if (graph[found_me.key].e !== "?" && graph[found_me.key].e !== "-") {
+      class_list.push("m-node-e-connected");
+    }
+    if (graph[found_me.key].s !== "?" && graph[found_me.key].s !== "-") {
+      class_list.push("m-node-s-connected");
+    }
+    if (graph[found_me.key].w !== "?" && graph[found_me.key].w !== "-") {
+      class_list.push("m-node-w-connected");
+    }
+
     if (found_me.key == current_room) {
       class_list.push("m-node-active");
     }
   }
 
   return (
-    <div className={class_list.join(" ")}>
-      {found_me !== null ? found_me.key : null}
+    <div className="map-node-container">
+      <div className={class_list.join(" ")}>
+        {found_me !== null ? found_me.key : null}
+      </div>
     </div>
   );
 };

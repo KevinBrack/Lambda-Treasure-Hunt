@@ -1,7 +1,7 @@
 .m-node {
   // padding: 2px;
   margin: 2px;
-  height: 45px;
+  // height: 34px;
 }
 
 .m-node-exists {
@@ -14,3 +14,31 @@
 .m-node-active {
   background: rgba(255, 255, 255, 0.5);
 }
+
+// .m-node-n-connected {
+//   border-top: 1px solid gray;
+//   border-top-left-radius: 0;
+//   border-top-right-radius: 0;
+// }
+// .m-node-e-connected {
+//   border-right: 1px solid gray;
+//   border-top-right-radius: 0;
+//   border-bottom-right-radius: 0;
+// }
+// .m-node-s-connected {
+//   border-bottom: 1px solid gray;
+//   border-bottom-right-radius: 0;
+//   border-bottom-left-radius: 0;
+// }
+// .m-node-w-connected {
+//   border-left: 1px solid gray;
+//   border-top-left-radius: 0;
+//   border-bottom-left-radius: 0;
+// }
+
+// .map-node-container {
+//   width: 40px;
+//   height: 40px;
+//   border: 1px solid white;
+//   margin: 0px 5px;
+// }
